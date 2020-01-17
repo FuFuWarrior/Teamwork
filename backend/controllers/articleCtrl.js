@@ -30,11 +30,12 @@ exports.createCommentOnArticle = (req,res) => {
 
 exports.createArticle = (req, res) => {
   const {article} = req.body
+  const {article_title} = req.body
   if (req.employee) {  
-    const query = 'INSERT INTO ARTICLES (article) VALUES($1) RETURNING*';
+    const query = 'INSERT INTO ARTICLES (article,article_title) VALUES($1,$2) RETURNING*';
     const value = [article];
 
-    pool.query('SELECT * FROM ARTICLES WHERE article = $1', [article])
+    pool.query('SELECT * FROM ARTICLES WHERE article = $1 and article_title=$2', [article,article_title])
     .then((resultCheck) => {
       if (resultCheck.rowCount > 0) {
         return res.status(404).json({status:404, message: `Article already exist`});
@@ -113,11 +114,12 @@ exports.getAllArticle = (req, res) => {
 
 exports.editarticle = (req,res) => {
         const {article} = req.body;
+        const {article_title} = req.body
         if (req.employee) {
           const article_id = Number(req.params.article_id)
           //const userid = Number(req.Params.user_id)
-          const query = 'UPDATE ARTICLES SET article=$1 where article_id=$2 RETURNING*';
-          const value = [article,article_id];
+          const query = 'UPDATE ARTICLES SET article=$1, article_title=$2 where article_id=$3 RETURNING*';
+          const value = [article,article_title,article_id];
           pool.query(query,value)
           .then((result) => {
             if (result.rowCount === 0) {
